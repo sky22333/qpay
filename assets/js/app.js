@@ -1,14 +1,10 @@
-// 支付相关变量
 let selectedPayment = "wxpay";
 let checkInterval = null;
 
-// DOM 加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    // 判断当前页面
     if (window.location.pathname.includes('success.php')) {
 
     } else {
-        // 支付页面逻辑
         document.querySelector('.fade-in').classList.add('active');
         
         // 支付方式切换事件
@@ -27,16 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
             wxpayBtn.classList.remove('selected');
         });
 
-        // 默认显示自定义金额输入框，隐藏金额选择框
         const amountSelect = document.getElementById('amount-select');
         const customAmount = document.getElementById('custom-amount');
 
         if (amountSelect && customAmount) {
-            amountSelect.classList.add('hidden');  // 隐藏金额选择框
-            customAmount.classList.remove('hidden');  // 显示自定义金额输入框
+            amountSelect.classList.add('hidden');
+            customAmount.classList.remove('hidden');
         }
 
-        // 金额选择事件
         if (amountSelect) {
             amountSelect.addEventListener('change', function() {
                 if (this.value === 'custom') {
@@ -49,18 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // 提交按钮事件
         const submitButton = document.getElementById('submit');
         if (submitButton) {
-            // 重置按钮状态的函数
             const resetButton = () => {
                 submitButton.disabled = false;
                 submitButton.innerText = "前往付款";
-                // 重新绑定创建订单事件
                 submitButton.onclick = createOrder;
             };
 
-            // 创建订单的函数
             const createOrder = () => {
                 const amountSelect = document.getElementById('amount-select');
                 const customAmount = document.getElementById('custom-amount').value;
@@ -76,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // 禁用按钮并显示加载状态
                 submitButton.disabled = true;
                 submitButton.innerText = "正在创建订单...";
 
@@ -100,13 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     if (data.code === 1) {
-                        // 订单创建成功
                         const payUrl = data.payurl || data.qrcode;
                         const order_id = data.order_id; 
                         
                         orderInfo.innerHTML = `📜 订单号: ${order_id} | 💰 金额: ¥${amount}`;
-                        
-                        // 更改按钮状态
+
                         submitButton.disabled = false;
                         submitButton.innerText = "无法扫码? 🔗 点这里";
                         submitButton.onclick = () => {
@@ -118,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         };
 
-                        // 显示二维码
                         setTimeout(() => {
                             qrLoader.style.display = "none";
                             qrcodeDiv.classList.remove("hidden");
@@ -129,10 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 height: 160
                             });
 
-                            // 开始检查订单状态（使用正确的订单号字段）
                             if (order_id) {
                                 checkInterval = setInterval(() => checkOrderStatus(order_id), 3000);
-                                console.log("开始检查订单状态:", order_id); // 添加日志便于调试
+                                console.log("开始检查订单状态:", order_id);
                             } else {
                                 console.error("未获取到订单号，无法开始检查状态");
                             }
@@ -149,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             };
 
-            // 初始绑定创建订单事件
             submitButton.onclick = createOrder;
         }
     }
@@ -166,25 +150,18 @@ function checkOrderStatus(orderId) {
                 console.error('Response text:', text);
                 throw new Error(`JSON解析失败: ${e.message}`);
             }
-            
-            // 修改状态判断逻辑
+
             if (data.data && data.data.trade_status === "PAID") {
                 clearInterval(checkInterval);
-                
-                // 创建表单并提交到success.php
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/success.php';
-
-                // 创建隐藏字段
                 const fields = {
                     'order_id': orderId,
                     'money': data.data.money,
                     'type': data.data.type,
                     'pay_time': data.data.pay_time
                 };
-
-                // 添加表单字段
                 Object.entries(fields).forEach(([key, value]) => {
                     const input = document.createElement('input');
                     input.type = 'hidden';
@@ -192,8 +169,6 @@ function checkOrderStatus(orderId) {
                     input.value = value;
                     form.appendChild(input);
                 });
-
-                // 添加到文档并提交
                 document.body.appendChild(form);
                 form.submit();
             }
