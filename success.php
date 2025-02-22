@@ -52,10 +52,9 @@ $pay_time = $_POST['pay_time'] ?? date('Y-m-d H:i:s');
         <div class="card">
             <div class="cta-row">
                 <button class="secondary" onclick="window.location.href='/'">返回首页</button>
-                <button class="primary" onclick="window.location.href='https://t.me/QinGdo'">联系晴宝</button>
+                <button class="primary" onclick="window.location.href='#">联系客服</button>
             </div>
         </div>
     </div>
-    <script src="/assets/js/cursor.js"></script>
     <script src="/assets/js/app.js"></script></body>
 </html>
