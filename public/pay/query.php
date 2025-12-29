@@ -7,11 +7,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/RequestValidator.php';
 $order_id = $_GET['order_id'] ?? "";
 $client_ip = IpUtil::getClientIp();
 
-// 记录查询请求流水日志
-Logger::log("支付", "查询订单", [
-    "order_id" => $order_id
-], $client_ip);
-
 // 参数验证
 $validationResult = RequestValidator::validateQuery($order_id);
 if (!$validationResult['valid']) {
