@@ -1,7 +1,11 @@
 services:
-  qpay:
+  web:
     build: .
     container_name: qpay
     ports:
       - "8080:80"
-    restart: always
+    environment:
+      - SITE_URL=https://your-domain.com
+      - PAY_DOMAIN=https://pay.example.com
+      - MERCHANT_ID=1000
+      - API_KEY=xxxxxxxxxxxxxxxxxxxxxx
