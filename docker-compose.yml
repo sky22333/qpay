@@ -2,6 +2,7 @@ services:
   web:
     build: .
     container_name: qpay
+    restart: always
     ports:
       - "8080:80"
     environment:
