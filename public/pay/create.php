@@ -3,7 +3,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/OrderUtil.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/SignatureUtil.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/Logger.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/IpUtil.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/EnvLoader.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/OrderFile.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/HttpRequestUtil.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/RequestValidator.php';
@@ -41,11 +40,11 @@ Logger::log("支付", "创建支付", [
 ], $client_ip);
 // 构建支付参数
 $params = [
-    "pid" => $config['merchant_id'],
+    "pid" => $config['MERCHANT_ID'],
     "type" => $type,
     "out_trade_no" => $order_id,  // 
-    "notify_url" => $config['notify_url'],
-    "return_url" => $config['return_url'],
+    "notify_url" => $config['NOTIFY_URL'],
+    "return_url" => $config['RETURN_URL'],
     "name" => $order_id,  // 直接使用订单号作为商品名称
     "money" => number_format(floatval($money), 2, '.', ''),
     "clientip" => $client_ip,
@@ -55,10 +54,10 @@ $params = [
 ];
 
 // 添加签名
-$params["sign"] = SignatureUtil::generateSign($params, $config['api_key']);
+$params["sign"] = SignatureUtil::generateSign($params, $config['API_KEY']);
 
 // 发送支付请求
-$response = HttpRequestUtil::sendPayRequest($config['payment_url'], $params);
+$response = HttpRequestUtil::sendPayRequest($config['PAYMENT_URL'], $params);
 
 // 处理错误
 if($response === false || (isset($response['error']) && $response['error'])) {

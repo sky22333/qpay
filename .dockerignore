@@ -1,4 +1,7 @@
-Dockerfile
-docker-compose.yml
 .git
 .github
+.vscode
+Dockerfile
+docker-compose.yml
+README.md
+log/

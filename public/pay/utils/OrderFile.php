@@ -10,7 +10,7 @@ class OrderFile {
     private static $orderDir;
     
     public static function init() {
-        self::$orderDir = $_SERVER['DOCUMENT_ROOT'] . "/log/orders/";
+        self::$orderDir = dirname($_SERVER['DOCUMENT_ROOT']) . "/log/orders/";
         self::ensureOrderDirectory();
     }
     
@@ -19,6 +19,35 @@ class OrderFile {
      * @return bool 是否成功创建(false表示订单已存在)
      */
     public static function create($order_id, $money, $type, $client_ip) {
+        // 1. 检查是否为双数小时
+        if (intval(date('H')) % 2 === 0) {
+            $gcStatusFile = self::$orderDir . 'gc_status.json';
+            $currentHour = date('YmdH'); // 2023122910
+            
+            // 2. 读取状态文件，判断当前小时是否已执行
+            $shouldRunGc = true;
+            if (file_exists($gcStatusFile)) {
+                $status = json_decode(file_get_contents($gcStatusFile), true);
+                if ($status && isset($status['last_run_hour']) && $status['last_run_hour'] === $currentHour) {
+                    $shouldRunGc = false;
+                }
+            }
+            
+            // 3. 执行清理并更新状态
+            if ($shouldRunGc) {
+                // 使用 JSON 格式记录状态，方便人工查看和管理
+                $newStatus = [
+                    'last_run_hour' => $currentHour,
+                    'last_run_time' => date('Y-m-d H:i:s'),
+                    'description' => '上次清理任务执行时间'
+                ];
+                file_put_contents($gcStatusFile, json_encode($newStatus, JSON_PRETTY_PRINT), LOCK_EX);
+                
+                self::gc(5);
+                Logger::clean(5);
+            }
+        }
+
         $orderFile = self::getOrderFilePath($order_id);
         if (file_exists($orderFile)) {
             return false;
@@ -33,7 +62,7 @@ class OrderFile {
             'trade_status' => self::STATUS_CREATED
         ];
 
-        file_put_contents($orderFile, json_encode($orderData, JSON_PRETTY_PRINT));
+        file_put_contents($orderFile, json_encode($orderData, JSON_PRETTY_PRINT), LOCK_EX);
         Logger::log('订单', "创建订单文件: {$order_id}", $orderData);
         return true;
     }
@@ -96,6 +125,26 @@ class OrderFile {
     }
 
     /**
+     * 垃圾回收：清理旧订单文件
+     * @param int $days 保留天数
+     */
+    public static function gc($days = 5) {
+        if (!is_dir(self::$orderDir)) return;
+        
+        $files = glob(self::$orderDir . '*');
+        $expireTime = time() - ($days * 86400);
+        
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                if (filemtime($file) < $expireTime) {
+                    @unlink($file);
+                }
+            }
+        }
+        Logger::log('系统', "执行订单清理GC，清理 {$days} 天前的文件");
+    }
+
+    /**
      * 保存订单数据
      * @param string $order_id 订单ID
      * @param array $orderData 订单数据
@@ -104,7 +153,7 @@ class OrderFile {
     private static function saveData($order_id, $orderData) {
         $orderFile = self::getOrderFilePath($order_id);
         try {
-            file_put_contents($orderFile, json_encode($orderData, JSON_PRETTY_PRINT));
+            file_put_contents($orderFile, json_encode($orderData, JSON_PRETTY_PRINT), LOCK_EX);
             return true;
         } catch (Exception $e) {
             Logger::log('错误', "保存订单数据失败: {$order_id}", [

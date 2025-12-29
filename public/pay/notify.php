@@ -19,7 +19,7 @@ Logger::log("回调", "收到回调请求", [
 ], $client_ip);
 
 // 验证必填参数
-$validationResult = RequestValidator::validateNotify($_GET, $config['merchant_id']);
+$validationResult = RequestValidator::validateNotify($_GET, $config['MERCHANT_ID']);
 if (!$validationResult['valid']) {
     Logger::log('回调', $validationResult['msg'], $_GET, $client_ip);
     die("fail");
@@ -27,7 +27,7 @@ if (!$validationResult['valid']) {
 
 // 直接验证签名
 $provided_sign = $_GET['sign'];
-$calculated_sign = SignatureUtil::generateSign($_GET, $config['api_key']);
+$calculated_sign = SignatureUtil::generateSign($_GET, $config['API_KEY']);
 
 if ($provided_sign !== $calculated_sign) {
     // 签名验证失败记录流水日志和错误日志

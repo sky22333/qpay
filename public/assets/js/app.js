@@ -116,7 +116,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
 
                             if (order_id) {
-                                checkInterval = setInterval(() => checkOrderStatus(order_id), 3000);
+                                let checkCount = 0;
+                                const maxChecks = 450; // 900秒(15分钟) / 2秒 = 450次
+                                
+                                checkInterval = setInterval(() => {
+                                    checkCount++;
+                                    if (checkCount > maxChecks) {
+                                        clearInterval(checkInterval);
+                                        console.log("订单轮询超时，停止检查");
+                                        const resultP = document.getElementById('result');
+                                        resultP.classList.remove('hidden');
+                                        resultP.innerText = "支付状态检测超时，如果您已支付，请手动刷新页面。";
+                                        return;
+                                    }
+                                    checkOrderStatus(order_id);
+                                }, 2000);
                                 console.log("开始检查订单状态:", order_id);
                             } else {
                                 console.error("未获取到订单号，无法开始检查状态");

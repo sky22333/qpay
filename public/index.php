@@ -1,8 +1,4 @@
 <?php
-// 引入配置加载器
-require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/utils/EnvLoader.php';
-// 加载配置
-EnvLoader::load();
 // 读取支付配置
 $pay_config = require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/config/pay_config.php';
 ?>
@@ -21,7 +17,7 @@ $pay_config = require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/config/pay_config.p
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- 引入自定义CSS和JS -->
-    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen px-4">
     <div class="bg-white shadow-xl rounded-lg p-6 max-w-md w-full fade-in">
@@ -60,5 +56,6 @@ $pay_config = require_once $_SERVER['DOCUMENT_ROOT'] . '/pay/config/pay_config.p
         </div>
     </div>
 
-    <script src="/assets/js/app.js"></script></body>
+    <script src="/assets/js/app.js"></script>
+</body>
 </html>

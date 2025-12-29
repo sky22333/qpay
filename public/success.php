@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// 验证请求合法性，改用POST方式
+// 验证请求合法性，POST方式
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['order_id']) || !isset($_POST['money']) || !isset($_POST['type'])) {
     header('Location: /');
     exit;
