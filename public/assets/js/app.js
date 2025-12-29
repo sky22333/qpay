@@ -91,8 +91,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.code === 1) {
                         const payUrl = data.payurl || data.qrcode;
                         const order_id = data.order_id; 
+                        const pay_type_text = selectedPayment === 'wxpay' ? '微信支付' : '支付宝';
+                        const pay_type_icon = selectedPayment === 'wxpay' ? '💚' : '💙';
                         
-                        orderInfo.innerHTML = `📜 订单号: ${order_id} | 💰 金额: ¥${amount}`;
+                        orderInfo.innerHTML = `
+                            <div class="text-center space-y-2">
+                                <div class="text-2xl font-bold text-gray-800 flex items-center justify-center gap-2">
+                                    <span>${pay_type_icon}</span>
+                                    <span>${pay_type_text}</span>
+                                </div>
+                                <div class="text-3xl font-black text-red-600 my-2">
+                                    以实际金额为准
+                                </div>
+                                <div class="text-xs text-gray-400 font-mono">
+                                    订单号: ${order_id}
+                                </div>
+                                <div class="text-xs text-orange-500 font-bold bg-orange-100 py-1 px-2 rounded-full inline-block mt-1">
+                                    ⚠️ 请务必按扫码后的实际金额支付
+                                </div>
+                            </div>
+                        `;
 
                         submitButton.disabled = false;
                         submitButton.innerText = "无法扫码? 🔗 点这里";

@@ -64,8 +64,8 @@ if ($_GET['trade_status'] === "TRADE_SUCCESS") {
         }
 
         $order_money = floatval($orderData['money']);
-        // 金额不一致
-        if (abs($order_money - $notify_money) > 0.01) {
+        // 判断金额是否一致（允许0.9元误差）
+        if (abs($order_money - $notify_money) > 0.9) {
             OrderFile::updateStatus($order_id, OrderFile::STATUS_AMOUNT_MISMATCH);
             Logger::log("支付系统", "回调金额不匹配", [
                 "order_id" => $order_id,
